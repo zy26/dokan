@@ -216,6 +216,12 @@ Function .onInit
     ${ElseIf} ${IsWin2008}
     ${ElseIf} ${IsWin2008R2}
     ${ElseIf} ${IsWin7}
+	; For Win8 and Server2012 release tests we need to include this WinVer.sh version from NSIS 3.0a2
+	; http://sourceforge.net/p/nsis/code/HEAD/tree/NSIS/trunk/Include/WinVer.nsh
+    ${ElseIf} ${IsWin8}
+    ${ElseIf} ${IsWin2012}
+    ${ElseIf} ${IsWin8.1}
+    ${ElseIf} ${IsWin2012R2}
     ${Else}
       MessageBox MB_OK "Your OS is not supported. Dokan library supports Windows 2003, Vista, 2008, 2008R2 and 7 for x64."
       Abort
@@ -226,6 +232,12 @@ Function .onInit
     ${ElseIf} ${IsWinVista}
     ${ElseIf} ${IsWin2008}
     ${ElseIf} ${IsWin7}
+	; For Win8 and Server2012 release tests we need to include this WinVer.sh version from NSIS 3.0a2
+	; http://sourceforge.net/p/nsis/code/HEAD/tree/NSIS/trunk/Include/WinVer.nsh
+    ${ElseIf} ${IsWin8}
+    ${ElseIf} ${IsWin2012}
+    ${ElseIf} ${IsWin8.1}
+    ${ElseIf} ${IsWin2012R2}
     ${Else}
       MessageBox MB_OK "Your OS is not supported. Dokan library supports Windows XP, 2003, Vista, 2008 and 7 for x86."
       Abort
