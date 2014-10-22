@@ -280,17 +280,15 @@ FunctionEnd
 
 Section "Dokan Library x86" section_x86
   ${GetWindowsVersion} $R0
-/*
   ${If} $R0 == '2012R2'
-    !insertmacro X86Files "win8"
+    !insertmacro X86Files "win7"
   ${ElseIf} $R0 == '8.1'
-    !insertmacro X86Files "win8"
+    !insertmacro X86Files "win7"
   ${ElseIf} $R0 == '2012'
-    !insertmacro X86Files "win8"
+    !insertmacro X86Files "win7"
   ${ElseIf} $R0 == '8'
-    !insertmacro X86Files "win8"
-*/
-  ${If} $R0 == '7'
+    !insertmacro X86Files "win7"
+  ${ElseIf} $R0 == '7'
     !insertmacro X86Files "win7"
   ${ElseIf} $R0 == '2008R2'
     !insertmacro X86Files "win7"
@@ -307,17 +305,15 @@ SectionEnd
 
 Section "Dokan Driver x86" section_x86_driver
   ${GetWindowsVersion} $R0
-/*
   ${If} $R0 == '2012R2'
-    !insertmacro X86Driver "win8"
+    !insertmacro X86Driver "win7"
   ${ElseIf} $R0 == '8.1'
-    !insertmacro X86Driver "win8"
+    !insertmacro X86Driver "win7"
   ${ElseIf} $R0 == '2012'
-    !insertmacro X86Driver "win8"
+    !insertmacro X86Driver "win7"
   ${ElseIf} $R0 == '8'
-    !insertmacro X86Driver "win8"
-*/
-  ${If} $R0 == '7'
+    !insertmacro X86Driver "win7"
+  ${ElseIf} $R0 == '7'
     !insertmacro X86Driver "win7"
   ${ElseIf} $R0 == '2008R2'
     !insertmacro X86Driver "win7"
@@ -335,17 +331,15 @@ SectionEnd
 
 Section "Dokan Driver x64" section_x64_driver
   ${GetWindowsVersion} $R0
-/*
   ${If} $R0 == '2012R2'
-    !insertmacro X64Driver "win8"
+    !insertmacro X64Driver "win7"
   ${ElseIf} $R0 == '8.1'
-    !insertmacro X64Driver "win8"
+    !insertmacro X64Driver "win7"
   ${ElseIf} $R0 == '2012'
-    !insertmacro X64Driver "win8"
+    !insertmacro X64Driver "win7"
   ${ElseIf} $R0 == '8'
-    !insertmacro X64Driver "win8"
-*/
-  ${If} $R0 == '7'
+    !insertmacro X64Driver "win7"
+  ${ElseIf} $R0 == '7'
     !insertmacro X64Driver "win7"
   ${ElseIf} $R0 == '2008R2'
     !insertmacro X64Driver "win7"
@@ -453,14 +447,14 @@ Function .onInit
       IfFileExists $SYSDIR\drivers\dokan.sys HasPreviousVersionX64 NoPreviousVersionX64
       ; To make EnableX64FSRedirection called in both cases, needs duplicated MessageBox code. How can I avoid this?
       HasPreviousVersionX64:
-        MessageBox MB_OK "Please unstall the previous version and restart your computer before running this installer."
+        MessageBox MB_OK "Please uninstall the previous version and restart your computer before running this installer."
         Abort
       NoPreviousVersionX64:
     ${EnableX64FSRedirection}
   ${Else}
     IfFileExists $SYSDIR\drivers\dokan.sys HasPreviousVersion NoPreviousVersion
     HasPreviousVersion:
-      MessageBox MB_OK "Please unstall the previous version and restart your computer before running this installer."
+      MessageBox MB_OK "Please uninstall the previous version and restart your computer before running this installer."
       Abort
     NoPreviousVersion:
   ${EndIf}
