@@ -1,4 +1,4 @@
-!define VERSION "0.6.0"
+!define VERSION "0.6.1"
 
 !include LogicLib.nsh
 !include x64.nsh
@@ -19,6 +19,175 @@ Page instfiles
 UninstPage uninstConfirm
 UninstPage instfiles
 
+; GetWindowsVersion 4.0 (2014-08-25)
+;
+; Based on Yazno's function, http://yazno.tripod.com/powerpimpit/
+; Update by Joost Verburg
+; Update (Macro, Define, Windows 7 detection) - John T. Haller of PortableApps.com - 2008-01-07
+; Update (Windows 8 detection) - Marek Mizanin (Zanir) - 2013-02-07
+; Update (Windows 8.1 detection) - John T. Haller of PortableApps.com - 2014-04-04
+; Update (Windows 2008, 2008R2, 2012 and 2012R2 detection) - Francisco Simoões Filho franksimoes@gmail.com - 2014-08-25
+;
+; Usage: ${GetWindowsVersion} $R0
+;
+; $R0 contains: 95, 98, ME, NT x.x, 2000, XP, 2003, Vista, 2008, 7, 2008R2,
+;                8, 2012, 8.1, 2012R2 or '' (for unknown)
+Function GetWindowsVersion
+ 
+  Push $R0
+  Push $R1
+ 
+  ClearErrors
+ 
+    ;--Key check if  Windows is Client ou Server.
+    ReadRegStr $R2 HKLM \
+               "SOFTWARE\Microsoft\Windows NT\CurrentVersion" InstallationType
+ 
+    ; windows NT family
+    ReadRegStr $R0 HKLM \
+               "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
+    StrCmp $R0 "" lbl_not_winnt
+    goto lbl_winnt
+    ;IfErrors 0 lbl_winnt
+ 
+    lbl_not_winnt:
+    ; we are not NT
+    ReadRegStr $R0 HKLM \
+               "SOFTWARE\Microsoft\Windows\CurrentVersion" VersionNumber
+ 
+    ; if empty 'VersionNumber' Erro
+    StrCmp $R0 "" lbl_error
+ 
+ 
+  StrCpy $R1 $R0 1
+  StrCmp $R1 '4' 0 lbl_error
+ 
+  StrCpy $R1 $R0 3
+ 
+  StrCmp $R1 '4.0' lbl_win32_95
+  StrCmp $R1 '4.9' lbl_win32_ME lbl_win32_98
+ 
+  lbl_win32_95:
+    StrCpy $R0 '95'
+  Goto lbl_done
+ 
+  lbl_win32_98:
+    StrCpy $R0 '98'
+  Goto lbl_done
+ 
+  lbl_win32_ME:
+    StrCpy $R0 'ME'
+  Goto lbl_done
+ 
+  lbl_winnt:
+ 
+  StrCpy $R1 $R0 1
+ 
+  StrCmp $R1 '3' lbl_winnt_x
+  StrCmp $R1 '4' lbl_winnt_x
+ 
+  StrCpy $R1 $R0 3
+ 
+  StrCmp $R1 '5.0' lbl_winnt_2000
+  StrCmp $R1 '5.1' lbl_winnt_XP
+  StrCmp $R1 '5.2' lbl_winnt_2003
+  StrCmp $R1 '6.0' lbl_winnt_vista_2008
+  StrCmp $R1 '6.1' lbl_winnt_7_2008R2
+  StrCmp $R1 '6.2' lbl_winnt_8_2012
+  StrCmp $R1 '6.3' lbl_winnt_81_2012R2 lbl_error
+ 
+ 
+  lbl_winnt_x:
+    StrCpy $R0 "NT $R0" 6
+  Goto lbl_done
+ 
+  lbl_winnt_2000:
+    Strcpy $R0 '2000'
+  Goto lbl_done
+ 
+  lbl_winnt_XP:
+    Strcpy $R0 'XP'
+  Goto lbl_done
+ 
+  lbl_winnt_2003:
+    Strcpy $R0 '2003'
+  Goto lbl_done
+ 
+  ;----------------- Family - Vista / 2008 -------------
+  lbl_winnt_vista_2008:
+    StrCmp $R2 'Client' go_vista
+    StrCmp $R2 'Server' go_2008
+ 
+    go_vista:
+      Strcpy $R0 'Vista'
+      Goto lbl_done
+ 
+    go_2008:
+      Strcpy $R0 '2008'
+      Goto lbl_done
+  ;-----------------------------------------------------
+ 
+  ;----------------- Family - 7 / 2008R2 -------------
+  lbl_winnt_7_2008R2:
+    StrCmp $R2 'Client' go_7
+    StrCmp $R2 'Server' go_2008R2
+ 
+    go_7:
+      Strcpy $R0 '7'
+      Goto lbl_done
+ 
+    go_2008R2:
+      Strcpy $R0 '2008R2'
+      Goto lbl_done
+  ;-----------------------------------------------------
+ 
+  ;----------------- Family - 8 / 2012 -------------
+  lbl_winnt_8_2012:
+    StrCmp $R2 'Client' go_8
+    StrCmp $R2 'Server' go_2012
+ 
+    go_8:
+      Strcpy $R0 '8'
+      Goto lbl_done
+ 
+    go_2012:
+      Strcpy $R0 '2012'
+      Goto lbl_done
+  ;-----------------------------------------------------
+ 
+  ;----------------- Family - 8.1 / 2012R2 -------------
+  lbl_winnt_81_2012R2:
+    StrCmp $R2 'Client' go_81
+    StrCmp $R2 'Server' go_2012R2
+ 
+    go_81:
+      Strcpy $R0 '8.1'
+      Goto lbl_done
+ 
+    go_2012R2:
+      Strcpy $R0 '2012R2'
+      Goto lbl_done
+  ;-----------------------------------------------------
+ 
+  lbl_error:
+    Strcpy $R0 '666'
+    goto lbl_done
+ 
+ 
+  lbl_done:
+  Pop $R1
+  Exch $R0
+ 
+ 
+FunctionEnd
+ 
+ 
+!macro GetWindowsVersion OUTPUT_VALUE
+	Call GetWindowsVersion
+	Pop `${OUTPUT_VALUE}`
+!macroend
+ 
+!define GetWindowsVersion '!insertmacro "GetWindowsVersion"'
 
 !macro X86Files os
 
@@ -110,46 +279,75 @@ UninstPage instfiles
 
 
 Section "Dokan Library x86" section_x86
-  ${If} ${IsWin7}
+  ${GetWindowsVersion} $R0
+  ${If} $R0 == '2012R2'
     !insertmacro X86Files "win7"
-  ${ElseIf} ${IsWin2008R2}
+  ${ElseIf} $R0 == '8.1'
     !insertmacro X86Files "win7"
-  ${ElseIf} ${IsWinVista}
+  ${ElseIf} $R0 == '2012'
+    !insertmacro X86Files "win7"
+  ${ElseIf} $R0 == '8'
+    !insertmacro X86Files "win7"
+  ${ElseIf} $R0 == '7'
+    !insertmacro X86Files "win7"
+  ${ElseIf} $R0 == '2008R2'
+    !insertmacro X86Files "win7"
+  ${ElseIf} $R0 == 'Vista'
     !insertmacro X86Files "wlh"
-  ${ElseIf} ${IsWin2008}
+  ${ElseIf} $R0 == '2008'
     !insertmacro X86Files "wlh"
-  ${ElseIf} ${IsWin2003}
+  ${ElseIf} $R0 == '2003'
     !insertmacro X86Files "wnet"
-  ${ElseIf} ${IsWinXp}
+  ${ElseIf} $R0 == 'XP'
     !insertmacro X86Files "wxp"
   ${EndIf}
 SectionEnd
 
 Section "Dokan Driver x86" section_x86_driver
-  ${If} ${IsWin7}
+  ${GetWindowsVersion} $R0
+  ${If} $R0 == '2012R2'
     !insertmacro X86Driver "win7"
-  ${ElseIf} ${IsWinVista}
+  ${ElseIf} $R0 == '8.1'
+    !insertmacro X86Driver "win7"
+  ${ElseIf} $R0 == '2012'
+    !insertmacro X86Driver "win7"
+  ${ElseIf} $R0 == '8'
+    !insertmacro X86Driver "win7"
+  ${ElseIf} $R0 == '7'
+    !insertmacro X86Driver "win7"
+  ${ElseIf} $R0 == '2008R2'
+    !insertmacro X86Driver "win7"
+  ${ElseIf} $R0 == 'Vista'
     !insertmacro X86Driver "wlh"
-  ${ElseIf} ${IsWin2008}
+  ${ElseIf} $R0 == '2008'
     !insertmacro X86Driver "wlh"
-  ${ElseIf} ${IsWin2003}
+  ${ElseIf} $R0 == '2003'
     !insertmacro X86Driver "wnet"
-  ${ElseIf} ${IsWinXp}
+  ${ElseIf} $R0 == 'XP'
     !insertmacro X86Driver "wxp"
   ${EndIf}
   !insertmacro DokanSetup
 SectionEnd
 
 Section "Dokan Driver x64" section_x64_driver
-  ${If} ${IsWin7}
+  ${GetWindowsVersion} $R0
+  ${If} $R0 == '2012R2'
     !insertmacro X64Driver "win7"
-  ${ElseIf} ${IsWin2008R2}
+  ${ElseIf} $R0 == '8.1'
     !insertmacro X64Driver "win7"
-  ${ElseIf} ${IsWinVista}
+  ${ElseIf} $R0 == '2012'
+    !insertmacro X64Driver "win7"
+  ${ElseIf} $R0 == '8'
+    !insertmacro X64Driver "win7"
+  ${ElseIf} $R0 == '7'
+    !insertmacro X64Driver "win7"
+  ${ElseIf} $R0 == '2008R2'
+    !insertmacro X64Driver "win7"
+  ${ElseIf} $R0 == 'Vista'
     !insertmacro X64Driver "wlh"
-  ${ElseIf} ${IsWin2008}
+  ${ElseIf} $R0 == '2008'
     !insertmacro X64Driver "wlh"
-  ${ElseIf} ${IsWin2003}
+  ${ElseIf} $R0 == '2003'
     !insertmacro X64Driver "wnet"
   ${EndIf}
   !insertmacro DokanSetup
@@ -211,21 +409,32 @@ Function .onInit
   ; Windows Version check
 
   ${If} ${RunningX64}
-    ${If} ${IsWin2003}
-    ${ElseIf} ${IsWinVista}
-    ${ElseIf} ${IsWin2008}
-    ${ElseIf} ${IsWin2008R2}
-    ${ElseIf} ${IsWin7}
+    ${GetWindowsVersion} $R0
+    ${If} $R0 == '2012R2'
+    ${ElseIf} $R0 == '8.1'
+    ${ElseIf} $R0 == '2012'
+    ${ElseIf} $R0 == '8'
+    ${ElseIf} $R0 == '7'
+    ${ElseIf} $R0 == '2008R2'
+    ${ElseIf} $R0 == 'Vista'
+    ${ElseIf} $R0 == '2008'
+    ${ElseIf} $R0 == '2003'
     ${Else}
       MessageBox MB_OK "Your OS is not supported. Dokan library supports Windows 2003, Vista, 2008, 2008R2 and 7 for x64."
       Abort
     ${EndIf}
   ${Else}
-    ${If} ${IsWinXP}
-    ${ElseIf} ${IsWin2003}
-    ${ElseIf} ${IsWinVista}
-    ${ElseIf} ${IsWin2008}
-    ${ElseIf} ${IsWin7}
+    ${GetWindowsVersion} $R0
+    ${If} $R0 == 'XP'
+    ${ElseIf} $R0 == '2012R2'
+    ${ElseIf} $R0 == '8.1'
+    ${ElseIf} $R0 == '2012'
+    ${ElseIf} $R0 == '8'
+    ${ElseIf} $R0 == '7'
+    ${ElseIf} $R0 == '2008R2'
+    ${ElseIf} $R0 == 'Vista'
+    ${ElseIf} $R0 == '2008'
+    ${ElseIf} $R0 == '2003'
     ${Else}
       MessageBox MB_OK "Your OS is not supported. Dokan library supports Windows XP, 2003, Vista, 2008 and 7 for x86."
       Abort
@@ -238,14 +447,14 @@ Function .onInit
       IfFileExists $SYSDIR\drivers\dokan.sys HasPreviousVersionX64 NoPreviousVersionX64
       ; To make EnableX64FSRedirection called in both cases, needs duplicated MessageBox code. How can I avoid this?
       HasPreviousVersionX64:
-        MessageBox MB_OK "Please unstall the previous version and restart your computer before running this installer."
+        MessageBox MB_OK "Please uninstall the previous version and restart your computer before running this installer."
         Abort
       NoPreviousVersionX64:
     ${EnableX64FSRedirection}
   ${Else}
     IfFileExists $SYSDIR\drivers\dokan.sys HasPreviousVersion NoPreviousVersion
     HasPreviousVersion:
-      MessageBox MB_OK "Please unstall the previous version and restart your computer before running this installer."
+      MessageBox MB_OK "Please uninstall the previous version and restart your computer before running this installer."
       Abort
     NoPreviousVersion:
   ${EndIf}
