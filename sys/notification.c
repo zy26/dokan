@@ -249,7 +249,6 @@ NotificationLoop(
 	PLIST_ENTRY	listHead;
 	PIRP_ENTRY	irpEntry;
 	LIST_ENTRY	completeList;
-	NTSTATUS	status;
 	KIRQL	irpIrql;
 	KIRQL	notifyIrql;
 	PIRP	irp;
@@ -378,7 +377,7 @@ NotificationThread(
 	events[3] = &Dcb->Global->PendingService.NotEmpty;
 	events[4] = &Dcb->Global->NotifyService.NotEmpty;
 
-	while (1) {
+  for ( ; ; ) {
 		status = KeWaitForMultipleObjects(
 			5, events, WaitAny, Executive, KernelMode, FALSE, NULL, waitBlock);
 

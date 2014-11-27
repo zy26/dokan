@@ -82,10 +82,7 @@ DokanCheckKeepAlive(
 	)
 {
 	LARGE_INTEGER		tickCount;
-	ULONG				eventLength;
-	PEVENT_CONTEXT		eventContext;
 	ULONG				mounted;
-	PDokanVCB			vcb = Dcb->Vcb;
 
 	//DDbgPrint("==> DokanCheckKeepAlive\n");
 
@@ -242,10 +239,6 @@ DokanResetPendingIrpTimeout(
 	listHead = &vcb->Dcb->PendingIrp.ListHead;
 
     for (thisEntry = listHead->Flink; thisEntry != listHead; thisEntry = nextEntry) {
-
-		PIRP				irp;
-		PIO_STACK_LOCATION	irpSp;
-
         nextEntry = thisEntry->Flink;
 
         irpEntry = CONTAINING_RECORD(thisEntry, IRP_ENTRY, ListEntry);
@@ -289,7 +282,7 @@ Routine Description:
 
 	KeSetTimerEx(&timer, timeout, DOKAN_CHECK_INTERVAL, NULL);
 	
-	while (TRUE) {
+  for ( ; ; ) {
 		status = KeWaitForMultipleObjects(2, pollevents, WaitAny,
 			Executive, KernelMode, FALSE, NULL, NULL);
 		

@@ -33,7 +33,6 @@ PrintUnknownDeviceIoctlCode(
 {
 	PCHAR baseCodeStr = "unknown";
 	ULONG baseCode = DEVICE_TYPE_FROM_CTL_CODE(IoctlCode);
-	ULONG functionCode = (IoctlCode & (~0xffffc003)) >> 2;
 
 	DDbgPrint("   Unknown Code 0x%x\n", IoctlCode);
 
@@ -55,7 +54,7 @@ PrintUnknownDeviceIoctlCode(
 		break;
 	}
 	DDbgPrint("   BaseCode: 0x%x(%s) FunctionCode 0x%x(%d)\n",
-		baseCode, baseCodeStr, functionCode, functionCode);
+    baseCode, baseCodeStr, (IoctlCode & (~0xffffc003)) >> 2, (IoctlCode & (~0xffffc003)) >> 2);
 }
 
 
@@ -319,9 +318,8 @@ DiskDeviceControl(
 		break;
 	case IOCTL_MOUNTDEV_LINK_CREATED:
 		{
-			PMOUNTDEV_NAME	mountdevName = Irp->AssociatedIrp.SystemBuffer;
 			DDbgPrint("   IOCTL_MOUNTDEV_LINK_CREATED\n");
-			DDbgPrint("     Name: %ws\n", mountdevName->Name); 
+      DDbgPrint("     Name: %ws\n", ((PMOUNTDEV_NAME)Irp->AssociatedIrp.SystemBuffer)->Name);
 			status = STATUS_SUCCESS;
 		}
 		break;
@@ -422,10 +420,7 @@ Return Value:
 	PDokanDCB			dcb;
 	PIO_STACK_LOCATION	irpSp;
 	NTSTATUS			status = STATUS_NOT_IMPLEMENTED;
-	ULONG				controlCode;
-	// {DCA0E0A5-D2CA-4f0f-8416-A6414657A77A}
-	GUID dokanGUID = 
-		{ 0xdca0e0a5, 0xd2ca, 0x4f0f, { 0x84, 0x16, 0xa6, 0x41, 0x46, 0x57, 0xa7, 0x7a } };
+	ULONG				controlCode = 0;
 
 
 	__try {

@@ -153,10 +153,8 @@ Return Value:
 --*/
 
 {
-	PDEVICE_OBJECT		deviceObject;
 	NTSTATUS			status;
 	PFAST_IO_DISPATCH	fastIoDispatch;
-	UNICODE_STRING		functionName;
 	FS_FILTER_CALLBACKS filterCallbacks;
 	PDOKAN_GLOBAL		dokanGlobal = NULL;
 

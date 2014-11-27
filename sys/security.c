@@ -31,9 +31,6 @@ DokanDispatchQuerySecurity(
 	PFILE_OBJECT		fileObject;
 	ULONG				info = 0;
 	ULONG				bufferLength;
-	SECURITY_DESCRIPTOR dummySecurityDesc;
-	ULONG				descLength;
-	PSECURITY_DESCRIPTOR securityDesc;
 	PSECURITY_INFORMATION securityInfo;
 	PDokanFCB			fcb;
 	PDokanDCB			dcb;
@@ -226,7 +223,6 @@ DokanDispatchSetSecurity(
 	ULONG				info = 0;
 	PSECURITY_INFORMATION	securityInfo;
 	PSECURITY_DESCRIPTOR	securityDescriptor;
-	PSECURITY_DESCRIPTOR	selfRelativesScurityDescriptor = NULL;
 	ULONG				securityDescLength;
 	ULONG				eventLength;
 	PEVENT_CONTEXT		eventContext;

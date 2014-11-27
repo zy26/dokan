@@ -338,8 +338,6 @@ Return Value:
 	NTSTATUS			status = STATUS_INVALID_PARAMETER;
 	PFILE_OBJECT		fileObject;
 	ULONG				info = 0;
-	PEPROCESS			process;
-	PUNICODE_STRING		processImageName;
 	PEVENT_CONTEXT		eventContext;
 	PFILE_OBJECT		relatedFileObject;
 	ULONG				fileNameLength = 0;
@@ -348,7 +346,6 @@ Return Value:
 	PDokanCCB			ccb;
 	PWCHAR				fileName;
 	BOOLEAN				needBackSlashAfterRelatedFile = FALSE;
-	HANDLE				accessTokenHandle;
 
 	PAGED_CODE();
 

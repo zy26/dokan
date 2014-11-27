@@ -26,10 +26,10 @@ DokanGetAccessToken(
    __in PIRP			Irp
    )
 {
-	KIRQL				oldIrql;
+	KIRQL				oldIrql = 0;
     PLIST_ENTRY			thisEntry, nextEntry, listHead;
 	PIRP_ENTRY			irpEntry;
-	PDokanVCB			vcb;
+	PDokanVCB			vcb = NULL;
 	PEVENT_INFORMATION	eventInfo;
 	PACCESS_TOKEN		accessToken;
 	NTSTATUS			status = STATUS_INVALID_PARAMETER;
@@ -38,7 +38,7 @@ DokanGetAccessToken(
 	BOOLEAN				hasLock = FALSE;
 	ULONG				outBufferLen;
 	ULONG				inBufferLen;
-	PACCESS_STATE		accessState;
+	PACCESS_STATE		accessState = NULL;
 
 	DDbgPrint("==> DokanGetAccessToken\n");
 

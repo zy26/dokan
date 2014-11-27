@@ -29,10 +29,7 @@ DokanDispatchQueryInformation(
 {
 	NTSTATUS				status = STATUS_NOT_IMPLEMENTED;
 	PIO_STACK_LOCATION		irpSp;
-	PVOID					buffer;
-	ULONG					remainingLength;
 	PFILE_OBJECT			fileObject;
-	FILE_INFORMATION_CLASS	fileInfo;
 	PDokanCCB				ccb;
 	PDokanFCB				fcb;
 	PDokanVCB				vcb;
@@ -302,9 +299,7 @@ DokanDispatchSetInformation(
 	NTSTATUS			status = STATUS_NOT_IMPLEMENTED;
 	PIO_STACK_LOCATION  irpSp;
 	PVOID				buffer;
-	ULONG				remainingLength;
 	PFILE_OBJECT		fileObject;
-	FILE_INFORMATION_CLASS fileInfo;
 	PDokanCCB			ccb;
 	PDokanFCB			fcb;
 	PDokanVCB			vcb;
@@ -496,9 +491,9 @@ DokanCompleteSetInformation(
 	__in PEVENT_INFORMATION EventInfo
 	)
 {
-	PIRP				irp;
+	PIRP				irp = NULL;
 	PIO_STACK_LOCATION	irpSp;
-	NTSTATUS			status;
+	NTSTATUS			status = 0;
 	ULONG				info	 = 0;
 	PDokanCCB			ccb;
 	PDokanFCB			fcb;
