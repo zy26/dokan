@@ -113,7 +113,6 @@ FindMountEntry(PDOKAN_CONTROL	DokanControl)
 VOID
 DokanControlFind(PDOKAN_CONTROL Control)
 {
-	PLIST_ENTRY		listEntry;
 	PMOUNT_ENTRY	mountEntry;
 
 	mountEntry = FindMountEntry(Control);
